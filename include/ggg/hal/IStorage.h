@@ -62,6 +62,9 @@ public:
     
     // Permanently deletes record from storage.
     virtual bool deleteRecord(StorageHandle_t handle) = 0;
+
+    // Optional diagnostic: Returns count of committed active records.
+    virtual size_t getCommittedCount() const { return 0; }
 };
 
 } // namespace hal

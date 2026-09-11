@@ -390,5 +390,15 @@ bool SpiFlashStorage::deleteRecord(hal::StorageHandle_t handle) {
     return true;
 }
 
+size_t SpiFlashStorage::getCommittedCount() const {
+    size_t count = 0;
+    for (size_t i = 0; i < _maxRecords; ++i) {
+        if (_slots[i].inUse && _slots[i].state == FLASH_STATE_COMMITTED) {
+            count++;
+        }
+    }
+    return count;
+}
+
 } // namespace plugins
 } // namespace ggg

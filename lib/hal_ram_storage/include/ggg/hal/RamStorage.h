@@ -94,7 +94,7 @@ public:
     // --- Diagnostic & Inspection Methods ---
     size_t getFreeSpace() const;
     size_t getAvailableSlots() const;
-    size_t getCommittedCount() const;
+    size_t getCommittedCount() const override;
     size_t getWritingCount() const;
     void clear();
 

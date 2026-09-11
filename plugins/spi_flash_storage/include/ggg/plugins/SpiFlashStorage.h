@@ -108,6 +108,11 @@ public:
      * @brief Returns the maximum usable payload size per record in bytes.
      */
     size_t getMaxPayloadPerRecord() const { return _sectorSize - 16; }
+
+    /**
+     * @brief Returns the count of currently committed active records.
+     */
+    size_t getCommittedCount() const override;
 };
 
 } // namespace plugins
