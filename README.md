@@ -15,7 +15,7 @@ The GGG (General Gadget Generator) framework provides a lightweight, determinist
 
 ---
 
-## Architectural Subsystems
+## Architectural Overview of included Subsystems
 
 ### 1. Hardware Abstraction Layer (HAL)
 
