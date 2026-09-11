@@ -1,0 +1,30 @@
+{
+  "name": "ggg",
+  "version": "0.1.0",
+  "description": "General Gadget Generator - Universal modular event-driven framework for microcontroller platforms",
+  "keywords": [
+    "framework",
+    "event-driven",
+    "rtos",
+    "freertos",
+    "hal",
+    "iot",
+    "embedded",
+    "zero-malloc"
+  ],
+  "authors": [
+    {
+      "name": "Alberto Soncini",
+      "email": "alberto@synergon-lab.xyz"
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "extraScript": "scripts/apply_kconfig.py",
+    "flags": [
+      "-I include"
+    ]
+  }
+}

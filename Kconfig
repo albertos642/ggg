@@ -1,0 +1,137 @@
+# @file Kconfig
+# @brief Root configuration menu for the GGG framework.
+#
+# @author Alberto Soncini <alberto@synergon-lab.xyz>
+# @copyright Copyright (c) 2012-2026 Alberto Soncini.
+# @license GPL-3.0-or-later
+#
+# This file is part of GGG.
+#
+# GGG is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GGG is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GGG. If not, see <https://www.gnu.org/licenses/>.
+
+# GGG (General Gadget Generator) Root Kconfig
+# Agnostic Bare-Metal / RTOS IoT Event-Driven Framework
+
+mainmenu "GGG (General Gadget Generator) Configuration"
+
+menu "System & RTOS Configuration"
+
+    choice
+        prompt "Operating System Kernel"
+        default GGG_RTOS_FREERTOS
+        help
+          Select the real-time operating system kernel for GGG.
+
+        config GGG_RTOS_FREERTOS
+            bool "FreeRTOS"
+            help
+              Use FreeRTOS (standard for embedded targets like SAMD21, ESP32, STM32).
+
+        config GGG_RTOS_NATIVE
+            bool "Native / POSIX / Simulation"
+            help
+              Use native thread/mock implementation for host compilation and unit tests.
+    endchoice
+
+    config GGG_SYSTEM_BUS_QUEUE_SIZE
+        int "SystemBus Event Queue Depth"
+        default 16
+        help
+          Maximum number of SystemEvent structures statically queued in FreeRTOS queue.
+
+    config GGG_SYSTEM_BUS_TASK_STACK_SIZE
+        int "SystemBus Task Stack Size (words)"
+        default 256
+        help
+          Stack depth allocated statically for the high-priority SystemBusTask.
+
+    config GGG_SYSTEM_BUS_TASK_PRIORITY
+        int "SystemBus Task Priority"
+        default 3
+        help
+          Priority for the SystemBus dispatcher task.
+
+    config GGG_TICK_TASK_STACK_SIZE
+        int "TickTask Stack Size (words)"
+        default 256
+        help
+          Stack depth allocated statically for the periodic TickTask.
+
+    config GGG_TICK_TASK_PRIORITY
+        int "TickTask Priority"
+        default 2
+        help
+          Priority for the periodic TickTask.
+
+    config GGG_TICK_PERIOD_MS
+        int "TickTask Period (milliseconds)"
+        default 10
+        help
+          Base period for the TickTask timebase and plugin tick() polling invocations.
+
+endmenu
+
+menu "Hardware Abstraction Layer (HAL) Options"
+
+    menu "Storage Subsystem"
+        choice
+            prompt "Default Storage Backend"
+            default GGG_STORAGE_RAM_POOL
+            help
+              Select the default transactional IStorage implementation.
+
+            config GGG_STORAGE_RAM_POOL
+                bool "Static RAM Pool Storage"
+                help
+                  In-memory fixed-size block storage (Zero-Malloc).
+
+            config GGG_STORAGE_FLASH_SPI
+                bool "SPI Flash Storage"
+                help
+                  External SPI NOR flash memory.
+        endchoice
+
+        config GGG_STORAGE_MAX_RECORDS
+            int "Maximum Concurrent Storage Records"
+            default 8
+            help
+              Maximum number of open or committed records in the storage manager.
+
+        config GGG_STORAGE_RAM_POOL_SIZE
+            int "RAM Pool Total Size (bytes)"
+            default 4096
+            depends on GGG_STORAGE_RAM_POOL
+            help
+              Total bytes statically reserved for the RAM storage pool.
+    endmenu
+
+    menu "Stream Subsystem"
+        config GGG_STREAM_BUFFER_SIZE
+            int "Default Stream Ring-Buffer Size (bytes)"
+            default 256
+            help
+              Size of static circular buffers for IInputStream / IOutputStream.
+    endmenu
+
+    # Dynamic HAL Drivers inclusion
+    orsource "lib/*/Kconfig"
+
+endmenu
+
+# ==========================================
+# Dynamic Native Plugins inclusion (Optional)
+# ==========================================
+menu "Native Plugins & Extensions"
+    orsource "plugins/*/Kconfig"
+endmenu

@@ -1,0 +1,22 @@
+# PlatformIO build artifacts
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# Kconfig user configuration
+.config
+.config.old
+include/autoconf.h
+
+# IDE, Language Server and OS
+.vscode/
+.idea/
+.cache/
+.clangd
+compile_commands.json
+*.swp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+

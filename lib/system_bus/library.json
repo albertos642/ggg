@@ -1,0 +1,14 @@
+{
+  "name": "system_bus",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "Alberto Soncini",
+      "email": "alberto@synergon-lab.xyz"
+    }
+  ],
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "FreeRTOS_SAMD21": "^2.3.0"
+  }
+}
