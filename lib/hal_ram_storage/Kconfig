@@ -22,6 +22,9 @@
 
 menuconfig GGG_HAL_RAM_STORAGE
     bool "Static RAM Storage Driver"
-    default y
+    default y if (!GGG_STORAGE_FLASH_SPI && !MUON_STORAGE_BACKEND_SPI_FLASH)
+    default n
+    depends on !GGG_STORAGE_FLASH_SPI && !MUON_STORAGE_BACKEND_SPI_FLASH
     help
       Enables the static in-memory Zero-Malloc transactional IStorage driver.
+

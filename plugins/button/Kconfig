@@ -1,0 +1,116 @@
+# @file Kconfig
+# @brief Configuration menu for GGG Button Plugin.
+#
+# @author Alberto Soncini <alberto@synergon-lab.xyz>
+# @copyright Copyright (c) 2012-2026 Alberto Soncini.
+# @license GPL-3.0-or-later
+#
+# This file is part of GGG.
+#
+# GGG is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GGG is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GGG. If not, see <https://www.gnu.org/licenses/>.
+
+menuconfig GGG_PLUGIN_BUTTON
+    bool "Button Plugin (Interrupt-driven with Integral Debounce)"
+    default y
+    help
+      Enables the GGG Button plugin to monitor GPIO pushbuttons with
+      interrupts, integral debounce filtering, and SystemBus event emission.
+
+if GGG_PLUGIN_BUTTON
+
+    config GGG_BUTTON_PIN
+        int "Default Button GPIO Pin"
+        default 5
+        help
+          GPIO pin number for the default button instance (e.g. Pin 5 on Feather M0).
+
+    choice
+        prompt "Button Polarity & Pull Resistor Mode"
+        default GGG_BUTTON_ACTIVE_LOW_PULLUP
+        help
+          Configures active state and internal/external pull resistor.
+
+    config GGG_BUTTON_ACTIVE_LOW_PULLUP
+        bool "Active Low with Internal Pull-Up"
+        help
+          Button connects to GND when pressed; MCU internal pull-up enabled (INPUT_PULLUP).
+
+    config GGG_BUTTON_ACTIVE_LOW_EXTERNAL
+        bool "Active Low with External Pull-Up"
+        help
+          Button connects to GND when pressed; external pull-up resistor expected (INPUT).
+
+    config GGG_BUTTON_ACTIVE_HIGH_PULLDOWN
+        bool "Active High with Internal Pull-Down"
+        help
+          Button connects to VCC when pressed; MCU internal pull-down enabled (INPUT_PULLDOWN).
+
+    config GGG_BUTTON_ACTIVE_HIGH_EXTERNAL
+        bool "Active High with External Pull-Down"
+        help
+          Button connects to VCC when pressed; external pull-down resistor expected (INPUT).
+
+    endchoice
+
+    choice
+        prompt "Active Edge Trigger"
+        default GGG_BUTTON_EDGE_FALLING
+        help
+          Edge that triggers the event emission on the System Bus.
+
+    config GGG_BUTTON_EDGE_FALLING
+        bool "Falling Edge"
+        help
+          Trigger on high-to-low voltage transition (press on active-low).
+
+    config GGG_BUTTON_EDGE_RISING
+        bool "Rising Edge"
+        help
+          Trigger on low-to-high voltage transition (press on active-high).
+
+    config GGG_BUTTON_EDGE_BOTH
+        bool "Both Edges"
+        help
+          Trigger on both rising and falling transitions.
+
+    endchoice
+
+    config GGG_BUTTON_SAMPLE_INTERVAL_MS
+        int "Debounce Sampling Interval (ms)"
+        default 5
+        range 1 50
+        help
+          Sampling period for the integral debounce filter.
+
+    config GGG_BUTTON_DEBOUNCE_THRESHOLD
+        int "Debounce Integrator Threshold (samples)"
+        default 6
+        range 2 30
+        help
+          Number of consecutive stable samples required to validate a state change.
+          Total debounce time = Sample Interval * Threshold (e.g. 5ms * 6 = 30ms).
+
+    config GGG_BUTTON_EVENT_ID
+        hex "SystemBus Event ID to Publish"
+        default 0x0100
+        help
+          Hexadecimal Event ID emitted on the System Bus (0x0100 = GGG_EVT_APP_TRIGGER).
+
+    config GGG_BUTTON_EVENT_CODE
+        int "Event Payload Trigger Code"
+        default 1
+        help
+          Numeric identifier placed into payload.u32[0] upon button trigger.
+
+endif

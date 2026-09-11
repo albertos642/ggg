@@ -1,0 +1,117 @@
+# @file Kconfig
+# @brief Configuration menu for GGG SPI Flash Storage Plugin.
+#
+# @author Alberto Soncini <alberto@synergon-lab.xyz>
+# @copyright Copyright (c) 2012-2026 Alberto Soncini.
+# @license GPL-3.0-or-later
+#
+# This file is part of GGG.
+#
+# GGG is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GGG is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GGG. If not, see <https://www.gnu.org/licenses/>.
+
+menuconfig GGG_PLUGIN_SPI_FLASH_STORAGE
+    bool "SPI Flash Storage Plugin (IStorage)"
+    default n
+    help
+      Enables non-volatile SPI NOR Flash block storage implementing
+      the ggg::hal::IStorage interface for persistent transactional storage.
+
+if GGG_PLUGIN_SPI_FLASH_STORAGE
+
+    choice
+        prompt "SPI Bus Configuration Mode"
+        default GGG_SPIFLASH_USE_HARDWARE_SPI
+        help
+          Select whether to use the default microcontroller hardware SPI peripheral
+          or explicitly define custom GPIO pins for SPI signals.
+
+    config GGG_SPIFLASH_USE_HARDWARE_SPI
+        bool "Hardware SPI Peripheral"
+        help
+          Uses standard MCU hardware SPI peripheral (SPIClass / default SPI bus).
+
+    config GGG_SPIFLASH_USE_CUSTOM_PINS
+        bool "Custom SPI Pins"
+        help
+          Explicitly configure SCK, MOSI, and MISO GPIO pins.
+
+    endchoice
+
+    config GGG_SPIFLASH_CS_PIN
+        int "Chip Select (CS) GPIO Pin"
+        default 4
+        help
+          GPIO pin connected to the flash Chip Select (/CS) line.
+
+    if GGG_SPIFLASH_USE_CUSTOM_PINS
+        config GGG_SPIFLASH_SCK_PIN
+            int "SCK Pin Number"
+            default 24
+            help
+              GPIO pin connected to SPI Clock (SCK).
+
+        config GGG_SPIFLASH_MOSI_PIN
+            int "MOSI Pin Number"
+            default 23
+            help
+              GPIO pin connected to SPI Master Out Slave In (MOSI).
+
+        config GGG_SPIFLASH_MISO_PIN
+            int "MISO Pin Number"
+            default 22
+            help
+              GPIO pin connected to SPI Master In Slave Out (MISO).
+    endif
+
+    choice
+        prompt "SPI Flash Chip Model"
+        default GGG_SPIFLASH_CHIP_W25Q64
+        help
+          Select the exact Winbond W25Q-series SPI NOR Flash chip model in use.
+
+    config GGG_SPIFLASH_CHIP_W25Q16
+        bool "Winbond W25Q16 (16 Mbit / 2 MByte, 512 sectors)"
+
+    config GGG_SPIFLASH_CHIP_W25Q32
+        bool "Winbond W25Q32 (32 Mbit / 4 MByte, 1024 sectors)"
+
+    config GGG_SPIFLASH_CHIP_W25Q64
+        bool "Winbond W25Q64 (64 Mbit / 8 MByte, 2048 sectors)"
+
+    config GGG_SPIFLASH_CHIP_W25Q128
+        bool "Winbond W25Q128 (128 Mbit / 16 MByte, 4096 sectors)"
+
+    endchoice
+
+    config GGG_SPIFLASH_STORAGE_BASE_OFFSET
+        hex "Flash Storage Base Offset (Bytes)"
+        default 0x000000
+        help
+          Start address in flash reserved for GGG IStorage records.
+          Allows sharing flash memory with bootloaders or filesystems.
+
+    config GGG_SPIFLASH_MAX_RECORDS
+        int "Maximum Concurrent Storage Records"
+        default 16
+        range 2 64
+        help
+          Maximum number of active transactional records tracked concurrently.
+
+    config GGG_SPIFLASH_SECTOR_SIZE
+        int "Flash Sector Size (Bytes)"
+        default 4096
+        help
+          Hardware sector erase size (typically 4096 bytes for Winbond W25Q).
+
+endif

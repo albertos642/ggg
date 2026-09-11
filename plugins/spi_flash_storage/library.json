@@ -1,0 +1,12 @@
+{
+  "name": "spi_flash_storage",
+  "version": "0.1.0",
+  "description": "GGG SPI Flash Storage Plugin - Transactional IStorage for Winbond W25Q NOR Flash",
+  "authors": [
+    {
+      "name": "Alberto Soncini",
+      "email": "alberto@synergon-lab.xyz"
+    }
+  ],
+  "license": "GPL-3.0-or-later"
+}

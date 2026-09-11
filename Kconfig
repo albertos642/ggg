@@ -93,11 +93,13 @@ menu "Hardware Abstraction Layer (HAL) Options"
 
             config GGG_STORAGE_RAM_POOL
                 bool "Static RAM Pool Storage"
+                depends on !MUON_STORAGE_BACKEND_SPI_FLASH
                 help
                   In-memory fixed-size block storage (Zero-Malloc).
 
             config GGG_STORAGE_FLASH_SPI
                 bool "SPI Flash Storage"
+                depends on GGG_PLUGIN_SPI_FLASH_STORAGE
                 help
                   External SPI NOR flash memory.
         endchoice
@@ -111,7 +113,7 @@ menu "Hardware Abstraction Layer (HAL) Options"
         config GGG_STORAGE_RAM_POOL_SIZE
             int "RAM Pool Total Size (bytes)"
             default 4096
-            depends on GGG_STORAGE_RAM_POOL
+            depends on GGG_STORAGE_RAM_POOL && !MUON_STORAGE_BACKEND_SPI_FLASH
             help
               Total bytes statically reserved for the RAM storage pool.
     endmenu

@@ -34,6 +34,13 @@
 #endif
 
 // Default compile-time configuration fallback if not set via Kconfig
+#if (defined(CONFIG_MUON_STORAGE_BACKEND_SPI_FLASH) || defined(CONFIG_GGG_STORAGE_FLASH_SPI)) && !defined(RUN_NATIVE_TESTS)
+#undef CONFIG_GGG_STORAGE_RAM_POOL_SIZE
+#define CONFIG_GGG_STORAGE_RAM_POOL_SIZE 0
+#undef CONFIG_GGG_STORAGE_MAX_RECORDS
+#define CONFIG_GGG_STORAGE_MAX_RECORDS 1
+#endif
+
 #ifndef CONFIG_GGG_STORAGE_MAX_RECORDS
 #define CONFIG_GGG_STORAGE_MAX_RECORDS 8
 #endif
@@ -69,6 +76,11 @@ public:
 
     RamStorage();
     virtual ~RamStorage() override = default;
+
+    /**
+     * @brief Initialises the storage engine (always succeeds for RAM pool).
+     */
+    bool begin() { return true; }
 
     // --- IStorage Pure Virtual Interface Implementation ---
     StorageHandle_t beginWrite() override;

@@ -1,0 +1,12 @@
+{
+  "name": "button",
+  "version": "0.1.0",
+  "description": "GGG Button Plugin - Interrupt-driven GPIO pushbutton with integral debounce",
+  "authors": [
+    {
+      "name": "Alberto Soncini",
+      "email": "alberto@synergon-lab.xyz"
+    }
+  ],
+  "license": "GPL-3.0-or-later"
+}
