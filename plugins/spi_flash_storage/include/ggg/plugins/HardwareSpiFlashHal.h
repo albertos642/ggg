@@ -65,6 +65,8 @@ public:
     bool writePage(uint32_t address, const uint8_t* buffer, size_t length) override;
     bool eraseSector4K(uint32_t sectorAddress) override;
     uint32_t readJedecId() override;
+    uint8_t readStatus();
+    bool unprotect();
     size_t getCapacityBytes() const override { return _capacityBytes; }
 };
 

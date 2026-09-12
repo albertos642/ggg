@@ -27,6 +27,7 @@
 #if defined(ARDUINO) && !defined(GGG_TARGET_NATIVE) && !defined(TARGET_NATIVE)
 
 #define CMD_WRITE_ENABLE    0x06
+#define CMD_WRITE_STATUS_1  0x01
 #define CMD_READ_STATUS_1   0x05
 #define CMD_READ_DATA       0x03
 #define CMD_PAGE_PROGRAM    0x02
@@ -86,6 +87,9 @@ bool HardwareSpiFlashHal::begin() {
         return false; // Hardware unresponsive
     }
 
+    // Clear any hardware block protection bits (BP0..BP2) so that sectors can be erased and written
+    unprotect();
+
     return true;
 }
 
@@ -109,6 +113,24 @@ bool HardwareSpiFlashHal::waitNotBusy(uint32_t timeoutMs) {
         delay(1);
     }
     return false;
+}
+
+uint8_t HardwareSpiFlashHal::readStatus() {
+    select();
+    _spi->transfer(CMD_READ_STATUS_1);
+    uint8_t status = _spi->transfer(0x00);
+    deselect();
+    return status;
+}
+
+bool HardwareSpiFlashHal::unprotect() {
+    writeEnable();
+    select();
+    _spi->transfer(CMD_WRITE_STATUS_1);
+    _spi->transfer(0x00); // Status Register 1 (BP0..BP2 = 0)
+    _spi->transfer(0x00); // Status Register 2
+    deselect();
+    return waitNotBusy(100);
 }
 
 bool HardwareSpiFlashHal::read(uint32_t address, uint8_t* buffer, size_t length) {
@@ -169,7 +191,7 @@ bool HardwareSpiFlashHal::eraseSector4K(uint32_t sectorAddress) {
     _spi->transfer(sectorAddress & 0xFF);
     deselect();
 
-    return waitNotBusy(400); // 4KB sector erase can take up to ~300ms on W25Q
+    return waitNotBusy(500); // 4KB sector erase can take up to ~400ms on W25Q
 }
 
 uint32_t HardwareSpiFlashHal::readJedecId() {

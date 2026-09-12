@@ -177,7 +177,9 @@ int SpiFlashStorage::allocateFreeSlot() {
     // 1. Look for an erased, completely free sector
     for (size_t i = 0; i < _maxRecords; ++i) {
         if (!_slots[i].inUse && _slots[i].state == FLASH_STATE_FREE) {
-            return (int)i;
+            if (_hal->eraseSector4K(_slots[i].sectorAddress)) {
+                return (int)i;
+            }
         }
     }
 

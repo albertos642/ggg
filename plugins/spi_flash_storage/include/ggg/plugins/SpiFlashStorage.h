@@ -113,6 +113,11 @@ public:
      * @brief Returns the count of currently committed active records.
      */
     size_t getCommittedCount() const override;
+
+    /**
+     * @brief Returns the underlying ISpiFlashHal pointer.
+     */
+    ISpiFlashHal* getHal() const { return _hal; }
 };
 
 } // namespace plugins
