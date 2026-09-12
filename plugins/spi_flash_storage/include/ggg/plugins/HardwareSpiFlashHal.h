@@ -27,6 +27,10 @@
 
 #include "ggg/plugins/ISpiFlashHal.h"
 
+#if __has_include("autoconf.h")
+#include "autoconf.h"
+#endif
+
 #if defined(ARDUINO) && !defined(GGG_TARGET_NATIVE) && !defined(TARGET_NATIVE)
 #include <Arduino.h>
 #include <SPI.h>

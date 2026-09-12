@@ -47,6 +47,10 @@ struct FlashSectorHeader {
 
 #define FLASH_HEADER_SIZE sizeof(FlashSectorHeader)
 
+#if __has_include("autoconf.h")
+#include "autoconf.h"
+#endif
+
 #if defined(ARDUINO) && !defined(GGG_TARGET_NATIVE) && !defined(TARGET_NATIVE)
 #if defined(CONFIG_GGG_SPIFLASH_USE_CUSTOM_PINS)
 static HardwareSpiFlashHal s_defaultHwHal(
@@ -60,7 +64,7 @@ static HardwareSpiFlashHal s_defaultHwHal(
 #if defined(CONFIG_GGG_SPIFLASH_CS_PIN)
     CONFIG_GGG_SPIFLASH_CS_PIN
 #else
-    4
+    5
 #endif
 );
 #endif

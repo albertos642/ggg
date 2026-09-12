@@ -31,6 +31,10 @@
 #include "ggg/core/IPlugin.h"
 #include "ggg/plugins/ISpiFlashHal.h"
 
+#if __has_include("autoconf.h")
+#include "autoconf.h"
+#endif
+
 #ifndef CONFIG_GGG_SPIFLASH_MAX_RECORDS
 #define CONFIG_GGG_SPIFLASH_MAX_RECORDS 16
 #endif
