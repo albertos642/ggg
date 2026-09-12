@@ -296,11 +296,15 @@ bool SpiFlashStorage::commitWrite(hal::StorageHandle_t handle) {
 
     // Program totalLength (offset 8 in header)
     uint32_t len = slot.totalLength;
-    _hal->writePage(slot.sectorAddress + 8, reinterpret_cast<const uint8_t*>(&len), sizeof(len));
+    if (!_hal->writePage(slot.sectorAddress + 8, reinterpret_cast<const uint8_t*>(&len), sizeof(len))) {
+        return false;
+    }
 
     // Program STATE_COMMITTED (offset 2 in header)
     uint16_t commState = FLASH_STATE_COMMITTED;
-    _hal->writePage(slot.sectorAddress + 2, reinterpret_cast<const uint8_t*>(&commState), sizeof(commState));
+    if (!_hal->writePage(slot.sectorAddress + 2, reinterpret_cast<const uint8_t*>(&commState), sizeof(commState))) {
+        return false;
+    }
 
     slot.state = FLASH_STATE_COMMITTED;
     return true;

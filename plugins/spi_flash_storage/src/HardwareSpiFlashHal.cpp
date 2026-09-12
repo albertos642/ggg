@@ -62,7 +62,7 @@ HardwareSpiFlashHal::HardwareSpiFlashHal(uint32_t csPin, uint32_t sckPin, uint32
 }
 
 void HardwareSpiFlashHal::select() {
-    _spi->beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+    _spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
     digitalWrite(_csPin, LOW);
 }
 
@@ -82,7 +82,22 @@ bool HardwareSpiFlashHal::begin() {
         _spi->begin();
     }
 
-    uint32_t id = readJedecId();
+    // Release from Deep Power-Down (instruction 0xAB) in case chip is in sleep mode
+    select();
+    _spi->transfer(0xAB);
+    deselect();
+    delayMicroseconds(50); // tRES1 recovery delay
+
+    // Retry reading JEDEC ID up to 3 times
+    uint32_t id = 0;
+    for (int retry = 0; retry < 3; ++retry) {
+        id = readJedecId();
+        if (id != 0x000000 && id != 0xFFFFFF) {
+            break;
+        }
+        delay(10);
+    }
+
     if (id == 0x000000 || id == 0xFFFFFF) {
         return false; // Hardware unresponsive
     }
@@ -94,6 +109,7 @@ bool HardwareSpiFlashHal::begin() {
 }
 
 void HardwareSpiFlashHal::writeEnable() {
+    waitNotBusy(100);
     select();
     _spi->transfer(CMD_WRITE_ENABLE);
     deselect();
@@ -161,6 +177,10 @@ bool HardwareSpiFlashHal::writePage(uint32_t address, const uint8_t* buffer, siz
         return false;
     }
 
+    if (!waitNotBusy(100)) {
+        return false;
+    }
+
     writeEnable();
 
     select();
@@ -179,6 +199,10 @@ bool HardwareSpiFlashHal::writePage(uint32_t address, const uint8_t* buffer, siz
 
 bool HardwareSpiFlashHal::eraseSector4K(uint32_t sectorAddress) {
     if (sectorAddress >= _capacityBytes) {
+        return false;
+    }
+
+    if (!waitNotBusy(100)) {
         return false;
     }
 
