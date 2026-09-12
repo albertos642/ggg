@@ -50,9 +50,11 @@ if GGG_PLUGIN_SPI_FLASH_STORAGE
 
     config GGG_SPIFLASH_CS_PIN
         int "Chip Select (CS) GPIO Pin"
-        default 4
+        default 5
         help
           GPIO pin connected to the flash Chip Select (/CS) line.
+          NOTE: On Adafruit Feather M0 LoRa, Pin 4 is the LoRa RESET line and Pin 8
+          is LoRa CS. Use Pin 5 (or 6, 10, 11, 12) for external SPI Flash CS.
 
     if GGG_SPIFLASH_USE_CUSTOM_PINS
         config GGG_SPIFLASH_SCK_PIN
