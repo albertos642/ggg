@@ -61,16 +61,18 @@ HardwareSpiFlashHal::HardwareSpiFlashHal(uint32_t csPin, uint32_t sckPin, uint32
 }
 
 void HardwareSpiFlashHal::select() {
+    _spi->beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
     digitalWrite(_csPin, LOW);
 }
 
 void HardwareSpiFlashHal::deselect() {
     digitalWrite(_csPin, HIGH);
+    _spi->endTransaction();
 }
 
 bool HardwareSpiFlashHal::begin() {
     pinMode(_csPin, OUTPUT);
-    deselect();
+    digitalWrite(_csPin, HIGH);
 
     if (_customPins) {
         // If board core supports custom SPI pins, configure here
