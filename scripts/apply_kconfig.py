@@ -341,6 +341,19 @@ def main():
             except Exception:
                 pass
 
+    # In native environment, ensure all libraries and plugins in search_roots are in CPPPATH
+    if IS_PIO_ENV and env.get("PIOPLATFORM") == "native":
+        for s_root in search_roots:
+            if os.path.isdir(s_root):
+                for item in os.listdir(s_root):
+                    item_path = os.path.join(s_root, item)
+                    if os.path.isdir(item_path):
+                        inc_cand = os.path.join(item_path, "include")
+                        if os.path.isdir(inc_cand) and inc_cand not in all_cpp_paths:
+                            all_cpp_paths.append(inc_cand)
+                        if item_path not in all_cpp_paths:
+                            all_cpp_paths.append(item_path)
+
     # Inject into PlatformIO / SCons build environment
     if IS_PIO_ENV:
         if all_cpp_paths:
@@ -368,6 +381,24 @@ def main():
                         print(f"[+] Registered sources for active module [{mod_name}]: {len(source_files)} files")
                     except Exception as e:
                         print(f"[!] Warning: BuildSources for {mod_name} ({e})")
+
+        # In native environment, also build inactive plugin and lib sources so unit test suites can link all modules
+        if env.get("PIOPLATFORM") == "native":
+            for s_root in search_roots:
+                if os.path.isdir(s_root):
+                    for item in os.listdir(s_root):
+                        item_path = os.path.join(s_root, item)
+                        if os.path.isdir(item_path) and not any(os.path.samefile(item_path, m[0]) for m in active_modules if os.path.exists(m[0])):
+                            src_cand = os.path.join(item_path, "src")
+                            if os.path.isdir(src_cand):
+                                src_files = [f for f in os.listdir(src_cand) if f.endswith((".cpp", ".c", ".cc"))]
+                                if src_files:
+                                    var_dir = os.path.join("$BUILD_DIR", "ggg_modules", item)
+                                    try:
+                                        env.BuildSources(var_dir, src_cand)
+                                        print(f"[+] Registered native test sources for module [{item}]: {len(src_files)} files")
+                                    except Exception:
+                                        pass
 
         # Register menuconfig custom target
         try:
