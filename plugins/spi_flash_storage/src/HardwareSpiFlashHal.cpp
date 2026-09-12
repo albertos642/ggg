@@ -36,6 +36,11 @@
 
 #define STATUS_BUSY_MASK    0x01
 
+extern "C" {
+__attribute__((weak)) void muonSpiLock() {}
+__attribute__((weak)) void muonSpiUnlock() {}
+}
+
 namespace ggg {
 namespace plugins {
 
@@ -62,6 +67,7 @@ HardwareSpiFlashHal::HardwareSpiFlashHal(uint32_t csPin, uint32_t sckPin, uint32
 }
 
 void HardwareSpiFlashHal::select() {
+    muonSpiLock();
     _spi->beginTransaction(SPISettings(2000000, MSBFIRST, SPI_MODE0));
     digitalWrite(_csPin, LOW);
 }
@@ -69,6 +75,7 @@ void HardwareSpiFlashHal::select() {
 void HardwareSpiFlashHal::deselect() {
     digitalWrite(_csPin, HIGH);
     _spi->endTransaction();
+    muonSpiUnlock();
 }
 
 bool HardwareSpiFlashHal::begin() {
